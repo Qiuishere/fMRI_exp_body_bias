@@ -10,7 +10,7 @@ function [TrialMatrix, TargetTrials] = RSceneTask_CreateTrainRunMat
 % 
 % 
 
-% 2 repetitions
+% 4 repetitions
 
 NStimTypes = 4; % n. of stimulus types
 

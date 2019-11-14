@@ -1,0 +1,39 @@
+
+Flip interval: 16.67 ms (should be 16.67 ms).
+
+[Warning: Sham run: press spacebar to continue.] 
+[> In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('RSceneTask_RunTraining', '/Users/u010155/Google Drive/DONDERS/MatlabCode/RotSceneTask_fMRI/RSceneTask_RunTraining.m', 208)" style="font-weight:bold">RSceneTask_RunTraining</a> (<a href="matlab: opentoline('/Users/u010155/Google Drive/DONDERS/MatlabCode/RotSceneTask_fMRI/RSceneTask_RunTraining.m',208,0)">line 208</a>)
+  In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('RSceneTask_MAIN', '/Users/u010155/Google Drive/DONDERS/MatlabCode/RotSceneTask_fMRI/RSceneTask_MAIN.m', 80)" style="font-weight:bold">RSceneTask_MAIN</a> (<a href="matlab: opentoline('/Users/u010155/Google Drive/DONDERS/MatlabCode/RotSceneTask_fMRI/RSceneTask_MAIN.m',80,0)">line 80</a>)] 
+
+ SCANNER TRIGGER (training run 1): 12-11-2019 13:41:05 
+Waiting for the task to begin in 15 seconds...
+--- BLOCK 1/5 ---
+ -> Hits: 0/3
+ -> FAs: 0/69
+((( Trial Duration 751/750 ms, SD = 1 ms )))
+--- BLOCK 2/5 ---
+ -> Hits: 0/15
+ -> FAs: 0/57
+((( Trial Duration 751/750 ms, SD = 1 ms )))
+--- BLOCK 3/5 ---
+ -> Hits: 0/6
+ -> FAs: 0/66
+((( Trial Duration 750/750 ms, SD = 1 ms )))
+--- BLOCK 4/5 ---
+ -> Hits: 0/9
+ -> FAs: 0/63
+((( Trial Duration 750/750 ms, SD = 1 ms )))
+--- BLOCK 5/5 ---
+ -> Hits: 0/7
+ -> FAs: 0/65
+((( Trial Duration 751/750 ms, SD = 3 ms )))
+
+
+Waiting for the run to end in 15 seconds...
+RUN DURATION: 490 seconds (expected duration: 329 seconds). 
+
+
+Serial ports (virtual response box) CLOSED at 12-Nov-2019 13:49:15. 
+
+Diary closed (12-Nov-2019 13:49:15)
+

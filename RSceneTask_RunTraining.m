@@ -84,8 +84,8 @@ for i = 2:40
     StimTypes(i) = ChooseFrom(1);
     StillToDo(StimTypes(i)) = 0;
     
-    if rem(i, 8) == 0 % reset stimulus types
-        StillToDo = ones(1, 8);
+    if rem(i, NStimTypes) == 0 % reset stimulus types
+        StillToDo = ones(1, NStimTypes);
     end
     
 end
@@ -127,25 +127,19 @@ StimTypes_list = {'A', 30; ...
 
 assert(size(StimTypes_list, 1) == NStimTypes);
               
-AllObjTxtrs = nan(RunTrials, 1);
-AllSceneTxtrs = AllObjTxtrs;
-ObjFiles = cell(RunTrials, 1);
-SceneFiles = ObjFiles;
+AllTxtrs = nan(RunTrials, 1);
+ImgFiles = cell(RunTrials, 1);
 
-ObjFileName = 'Object%g%c_%04d.png';
-SceneFileName = 'Background%g_%04d.png';
+FileName = 'Scene%g%c_%04d.png';
 
 for i = 1:RunTrials
 
     StartPoint = StimTypes_list{AllTrials.Type(i), 1};
-    SceneFrame = StimTypes_list{AllTrials.Type(i), 2};
-    ObjFrame = StimTypes_list{AllTrials.Type(i), 3};
+    ThisFrame = StimTypes_list{AllTrials.Type(i), 2};
         
-    ObjFileName_this = sprintf(ObjFileName, AllTrials.Stimulus(i), StartPoint, ObjFrame);
-    SceneFileName_this = sprintf(SceneFileName, AllTrials.Stimulus(i), SceneFrame);
+    FileName_this = sprintf(FileName, AllTrials.Stimulus(i), StartPoint, ThisFrame);
     
-    ObjFiles{i} = fullfile(StimDir, ObjFileName_this);
-    SceneFiles{i} = fullfile(StimDir, SceneFileName_this);
+    ImgFiles{i} = fullfile(StimDir, FileName_this);
     
 end
 
@@ -155,15 +149,10 @@ thisblock = 1:72; % 8 mini-blocks of 9 stimuli each
 
 for i = thisblock
     
-    [ThisObj, ~, Alpha] = imread(ObjFiles{i});
-    ThisObj = double(ThisObj) * 0.5 + 64;
-    ThisObj = cat(3, ThisObj, Alpha);
+    ThisImg = imread(ImgFiles{i});
+    ThisImg = double(ThisImg) * 0.5 + 64;
     
-    ThisScene = imread(SceneFiles{i});
-    ThisScene = double(ThisScene) * 0.5 + 64;
-    
-    AllObjTxtrs(i) = Screen('MakeTexture', w, ThisObj);
-    AllSceneTxtrs(i) = Screen('MakeTexture', w, ThisScene);
+    AllTxtrs(i) = Screen('MakeTexture', w, ThisImg);
     
 end
 
@@ -240,8 +229,7 @@ for trial = 1:RunTrials
     
     for frame = 1:(Frames.On + Frames.Off)
         if frame <= Frames.On
-            Screen('DrawTexture', w, AllSceneTxtrs(trial), [], ImRect);
-            Screen('DrawTexture', w, AllObjTxtrs(trial), [], ImRect);
+            Screen('DrawTexture', w, AllTxtrs(trial), [], ImRect);
         end
         Screen('FillOval', w, White, FixRct);
         Screen('FrameOval', w, Black, FixRct);
@@ -327,8 +315,7 @@ for trial = 1:RunTrials
         
         %% Load images for next block
         
-        Screen('Close', AllObjTxtrs(thisblock));
-        Screen('Close', AllSceneTxtrs(thisblock));
+        Screen('Close', AllTxtrs(thisblock));
         
         if trial ~= RunTrials
             
@@ -336,15 +323,10 @@ for trial = 1:RunTrials
             
             for i = thisblock
                 
-                [ThisObj, ~, Alpha] = imread(ObjFiles{i});
-                ThisObj = double(ThisObj) * 0.5 + 64;
-                ThisObj = cat(3, ThisObj, Alpha);
+                ThisImg = imread(ImgFiles{i});
+                ThisImg = double(ThisImg) * 0.5 + 64;
                 
-                ThisScene = imread(SceneFiles{i});
-                ThisScene = double(ThisScene) * 0.5 + 64;
-                
-                AllObjTxtrs(i) = Screen('MakeTexture', w, ThisObj);
-                AllSceneTxtrs(i) = Screen('MakeTexture', w, ThisScene);
+                AllTxtrs(i) = Screen('MakeTexture', w, ThisImg);
                 
             end
             
