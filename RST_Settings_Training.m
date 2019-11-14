@@ -72,7 +72,7 @@ FixRct = CenterRectOnPoint([0 0 FixSize FixSize], xCenter, yCenter + FixOffset);
 %% Stimulus directory
 
 if IsOSX
-    StimDir = '/Users/u010155/Documents/BlenderFiles/ObjectswShadows';
+    StimDir = '/Users/u010155/Documents/BlenderFiles/FinalRenders';
 else
-    StimDir = fullfile('Stimuli', 'Training');
+    StimDir = fullfile('Stimuli', 'Test');
 end

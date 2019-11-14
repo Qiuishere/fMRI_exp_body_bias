@@ -10,18 +10,17 @@ function [TrialMatrix, TargetTrials] = RSceneTask_CreateTrainRunMat
 % 
 % 
 
-% 2 repetitions
-
-NStimTypes = 4; % n. of stimulus types
-
-TotNTrials = 360;
+NStimTypes = 8; % n. of stimulus types
+%NReps = 2;
 
 NStimuli = 20;
-NTargets = 10; % how many targets per stimulus type
+NTargets = 5; % how many targets per stimulus type
 
-BlockSize = 9; % how many trials in a mini-block 
+BlockSize = 9; % how many trials in a mini-block
 
-TrialMatrix = zeros(NStimTypes, TotNTrials/NStimTypes);
+TotNTrials = BlockSize 
+
+TrialMatrix = zeros(NStimTypes, 45);
 TargetTrials = TrialMatrix; % where repetition occurs (and subject should respond)
 
 % Generate each row of the matrices:

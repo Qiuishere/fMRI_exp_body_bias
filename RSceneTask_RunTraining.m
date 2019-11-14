@@ -59,7 +59,7 @@ Screen('Flip', w);
 
 %% Conditions
 
-NStimTypes = 8;
+NStimTypes = 4;
 
 [TrialMatrix, TargetTrials] = RSceneTask_CreateTrainRunMat;
 
@@ -73,7 +73,7 @@ assert(size(TrialMatrix, 1) == NStimTypes && size(TargetTrials, 1) == NStimTypes
 StimTypes = zeros(1, 40); % what stimulus types in what mini-blocks
 StillToDo = ones(1, NStimTypes); % stimulus types still to assign
 
-StimTypes(1) = randi(4);
+StimTypes(1) = randi(NStimTypes);
 StillToDo(StimTypes(1)) = 0;
 
 for i = 2:40
@@ -114,24 +114,16 @@ end
 % SHOULD WE SEPARATE BEDS AND COUCHES?
 % 
 % Stimulus types:
-% 1. View A - Scene 30° - Object 30° 
-% 2. View A - Scene 30° - Object 90°
-% 3. View B - Scene 30° - Object 30° 
-% 4. View B - Scene 30° - Object 90°
-% 5. View A - Scene 90° - Object 30°
-% 6. View A - Scene 90° - Object 90°
-% 7. View B - Scene 90° - Object 30°
-% 8. View B - Scene 90° - Object 90°
+% 1. View A - Rotation 30° 
+% 2. View A - Rotation 90°
+% 3. View B - Rotation 30° 
+% 4. View B - Rotation 90°
 %
 
-StimTypes_list = {'A', 30, 30; ...
-                  'A', 30, 90; ...
-                  'B', 30, 30; ...
-                  'B', 30, 90; ...
-                  'A', 90, 30; ...
-                  'A', 90, 90; ...
-                  'B', 90, 30; ...
-                  'B', 90, 90};
+StimTypes_list = {'A', 30; ...
+                  'A', 90; ...
+                  'B', 30; ...
+                  'B', 90};
 
 assert(size(StimTypes_list, 1) == NStimTypes);
               
