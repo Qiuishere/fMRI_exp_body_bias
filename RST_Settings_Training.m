@@ -22,9 +22,6 @@ else
     
     ImSize = [ImW ImH];
     
-    XMargin = 50; % how many extra pixels around bounding box
-    YMargin = 20;
-    
 end
 
 %% Timing
@@ -52,12 +49,6 @@ if RealRun
     
     [ImSize, ~, ~] = ang2pix3([ImW ImH], ViewD, [ScreenResolution.width, ScreenResolution.height], ScreenSize);
     ImSize = round(ImSize);
-    
-    [XMargin, ~, ~] = ang2pix3(XMargin, ViewD, [ScreenResolution.width, ScreenResolution.height], ScreenSize);
-    XMargin = round(XMargin(1));
-    
-    [YMargin, ~, ~] = ang2pix3(YMargin, ViewD, [ScreenResolution.width, ScreenResolution.height], ScreenSize);
-    YMargin = round(YMargin(2));
     
 end
 
