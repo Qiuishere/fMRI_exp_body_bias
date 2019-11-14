@@ -35,12 +35,13 @@ end
 %% Timing
 
 % Trial:
-T.Fix = 1.0;
-T.Im = 0.5;
-T.First = 2.0;
-T.Final = 2.0;
+T.Fix = 1.5; % maximum
+T.Seq(1) = 2.0;
+T.Seq(2:4) = 0.5;
+T.Seq(5) = 1.5;
 T.Probe = 0.05;
 T.ISI = 0.1;
+T.PreRespDelay = 0.05; % very short pause before response screen
 T.Resp = 1.5; % max. time to give a response
 
 T.Delay = 15.0; % at the start and end of run
@@ -55,8 +56,7 @@ end
 
 Frames = structfun(@(x) x * RefRate, T, 'UniformOutput', false);
 
-TrialSequence = [T.Fix, T.First, T.Im, T.Im, T.Im, ...
-                 T.Final, T.Probe, T.ISI, T.Probe, T.Resp];
+TrialSequence = [T.Fix, T.Seq, T.Probe, T.ISI, T.Probe, T.PreRespDelay, T.Resp];
 TrialSet = sum(TrialSequence); % how much a trial should last
              
 %% Conversions (DVA to pixels)
