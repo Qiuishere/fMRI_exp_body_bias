@@ -57,6 +57,7 @@ Frames = structfun(@(x) x * RefRate, T, 'UniformOutput', false);
 
 TrialSequence = [T.Fix, T.First, T.Im, T.Im, T.Im, ...
                  T.Final, T.Probe, T.ISI, T.Probe, T.Resp];
+TrialSet = sum(TrialSequence); % how much a trial should last
              
 %% Conversions (DVA to pixels)
 
@@ -76,4 +77,20 @@ if RealRun
     
 end
 
+%% Stimulus position (rect)
 
+ImRect = CenterRectOnPoint([0 0 ImSize], xCenter, yCenter); 
+
+%% Fixation
+
+FixRct = CenterRectOnPoint([0 0 FixSize FixSize], xCenter, yCenter + FixOffset);
+
+%% Stimulus directory
+
+if IsOSX
+    StimDir_main = '/Users/u010155/Documents/BlenderFiles/FinalRenders';
+    StimDir_rot = '/Users/u010155/Documents/BlenderFiles/RotScene/Rotate_half';
+else
+    StimDir_main = fullfile('Stimuli', 'Test');
+    StimDir_rot = fullfile(StimDir_main, 'Rotate');
+end
