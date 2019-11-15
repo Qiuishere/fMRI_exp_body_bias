@@ -194,7 +194,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
     Txtrs = nan(1, length(ThisSeq));
 
     for i = 1:length(ThisSeq)
-        ThisImg = double(imread(fullfile(StimDir_main, [ImgFile '_' sprintf('%04d.png',Sequence(i))])));
+        ThisImg = double(imread(fullfile(StimDir_main, [ImgFile '_' sprintf('%04d.png', ThisSeq(i))])));
         ThisImg = ThisImg * 0.5 + 64;
         Txtrs(i) = Screen('MakeTexture', w, ThisImg);
         clear ThisImg
