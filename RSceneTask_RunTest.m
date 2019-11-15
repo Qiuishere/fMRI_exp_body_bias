@@ -324,6 +324,8 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             [wkey, timeStamp] = BitsiBB.getResponse(timeout, true);
             
             if ismember(wkey, RespKeys) && ~ButPres
+                ButPres = 1;
+                AllTrials.
     
 end
 
