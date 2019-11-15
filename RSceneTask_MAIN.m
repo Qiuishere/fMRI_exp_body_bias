@@ -41,7 +41,7 @@ if RealRun, DataDir = 'Data_Lab'; else, DataDir = 'Data_Demo'; end
 %% List of experiment runs
 % Test, Training, Localizer, Demo
 
-Runs = {'Training'};
+Runs = {'Test'};
 
 %% Participant info
 

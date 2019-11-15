@@ -50,7 +50,7 @@ end
 %% Message
 % while loading images and waiting for scanner trigger
 
-InstrTxt = sprintf(['Run %g/%g\n\nDoes the object turn\nclockwise or counterclockwise?'], RunNo, NRuns);
+InstrTxt = sprintf('Run %g/%g\n\nDoes the object turn\nclockwise or counterclockwise?', RunNo, NRuns);
 
 DrawFormattedText(w, InstrTxt, 'center', 'center', White);
 
@@ -460,8 +460,6 @@ DrawFormattedText(w, EndTxt, 'center', 'center', White);
 Screen('Flip', w);
 
 %% CLEAN UP
-
-%Screen('Close', Txtrs); % moved inside loop
 
 close(BitsiBB);
 if RealRun
