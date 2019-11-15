@@ -1,9 +1,9 @@
 function RSceneTask_RunTest(SubjNo, RunInfo, DataDir)
 
-% 
-% 
-% 
-% 
+%
+%
+%
+%
 
 %% Startup
 
@@ -89,27 +89,27 @@ TotNTrials = size(AllTrials, 1);
 %% Assign initial difference (if not already done)
 
 if ThisRunNo == 1
-    
+
     if rand > 0.5
         AllTrials.Diff(1) = Diff_Start;
     else
         AllTrials.Diff(1) = -Diff_Start;
     end
-    
+
     AllTrials.Orients = num2cell(AllTrials.Orients);
-    
+
     % Decide orientations in the first trial based on initial difference:
     AllTrials.Orients{1}(1) = round(normrnd(0, 1));
     AllTrials.Orients{1}(2) = max(min(AllTrials.Orients{1}(1) + AllTrials.Diff(1), ...
         OrientLims(2)), OrientLims(1));
-    
+
     % Random jitter before target onset:
     AllJitter = rand(TotNTrials, 1) * 0.5;
-    AllTrials.Jitter = Frames.Final - round(AllJitter/ifi);
-    
+    AllTrials.Jitter = Frames.Seq(5) - round(AllJitter/ifi);
+
     % Determine fixation time taking jitter into account
     AllTrials.Fix = Frames.Fix - round((0.5 - AllJitter)/ifi);
-    
+
 end
 
 %% Create structure to save timestamps
@@ -170,38 +170,38 @@ tic;
 FirstTrial = (ThisRunNo - 1) * RunTrials + 1;
 
 for trial = FirstTrial:FirstTrial + RunTrials - 1
-    
+
     fprintf('--- TRIAL %g/%g ---\n', trial, RunTrials);
-    
+
     %% Prepare for stimulus presentation
-    
+
     if RealRun
         BitsiBB.clearResponses();
     end
-    
+
     % Start ITI
     Screen('FillOval', w, White, FixRct);
     Screen('FrameOval', w, Black, FixRct);
     TStamp.event(trial, 1) = Screen('Flip', w);
-    
+
     %% Load images, create textures
-    
+
     ThisView = Views{AllTrials.InitView(trial)};
     ThisSeq = AllTrials.Sequence{trial};
-    
+
     ImgFile = sprintf('Scene%g%c', AllTrials.Scene(trial), ThisView);
-    
+
     Txtrs = nan(1, length(ThisSeq));
-    
+
     for i = 1:length(ThisSeq)
-        ThisImg = double(imread(fullfile(StimDir, [ImgFile '_' sprintf('%04d.png',Sequence(i))])));
+        ThisImg = double(imread(fullfile(StimDir_main, [ImgFile '_' sprintf('%04d.png',Sequence(i))])));
         ThisImg = ThisImg * 0.5 + 64;
         Txtrs(i) = Screen('MakeTexture', w, ThisImg);
         clear ThisImg
     end
-    
+
     % Load bounding box
-    
+
     BBoxes = dlmread(fullfile(StimDir,[ImgFile '_BBox.txt']));
     %BBoxes = BBoxes(Sequence/5+1,:);
     LargestBox = [min(BBoxes(:,1:2)), max(BBoxes(:,3:4))];
@@ -212,7 +212,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
     LargestBox(4) = LargestBox(4) + YMargin;
     LargestBox([1,3]) = LargestBox([1,3]) + ImRect(1);
     LargestBox([2,4]) = LargestBox([2,4]) + ImRect(2);
-    
+
     %% Load two probes
 
     if AllTrials.Consistent(trial)
@@ -242,31 +242,31 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
         clear ThisImg
 
     end
-    
+
     %% ACTUALLY SHOW STUFF
-    
+
     LoadDelay = round(toc/ifi);
-    
+
     if LoadDelay < AllTrials.Fix(trial)
-        
+
         for frame = 1:(AllTrials.Fix(trial) - LoadDelay)
-            
+
             Screen('FillOval', w, White, FixRct);
             Screen('FrameOval', w, Black, FixRct);
-            
+
         end
     end
-    
+
     for stim = 1:length(ThisSeq)
-        
+
         if stim < 5
             StimFrames = T.Seq(stim);
         else
             StimFrames = AllTrials.Jitter(trial);
         end
-        
+
         for frame = 1:StimFrames
-            
+
             Screen('DrawTexture', w, Txtrs(stim), [], ImRect);
             if stim > 2
                 Screen('FillRect', w,  Grey, LargestBox);
@@ -274,26 +274,26 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             Screen('FillOval', w, White, FixRct);
             Screen('FrameOval', w, Black, FixRct);
             tnow = Screen('Flip', w);
-            
+
             if frame == 1
                 TStamp.event(trial, stim + 1) = tnow;
             end
-            
+
         end
-        
+
     end
-    
+
     % Show the two probes:
-    
+
     for pr = 1:2
-        
+
         for frame = 1:Frames.Probe
-            
+
             Screen('DrawTexture', w, ProbeTxtrs(pr), [], ImRect);
             Screen('FillOval', w, White, FixRct);
             Screen('FrameOval', w, Black, FixRct);
             tnow = Screen('Flip', w);
-            
+
             if frame == 1
                 if pr == 1
                     TStamp.event(trial, 7) = tnow;
@@ -301,9 +301,9 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
                     TStamp.event(trial, 9) = tnow;
                 end
             end
-            
+
         end
-    
+
         if pr == 1
 
             for frame = 1:T.ISI
@@ -311,7 +311,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
                 Screen('FillOval', w, White, FixRct);
                 Screen('FrameOval', w, Black, FixRct);
                 tnow = Screen('Flip', w);
-                
+
                 if frame == 1
                     TStamp.event(trial, 8) = tnow;
                 end
@@ -319,32 +319,32 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             end
 
         end
-        
+
     end
-    
+
     TStamp.event(trial, 10) = Screen('Flip', w);
     WaitSecs(T.PreRespDelay);
-      
+
     %% Get response
-    
+
     ButPres = 0;
-    
+
     for frame = 1:Frames.Resp
-    
+
         Screen('FillOval', w, White, FixRct);
         Screen('FrameOval', w, Black, FixRct);
         tnow = Screen('Flip', w);
-        
+
         if frame == 1
             TStamp.event(trial, 11) = tnow;
         end
-        
+
         % Response from button box:
-        
+
         if RealRun
-            
+
             [wkey, timeStamp] = BitsiBB.getResponse(timeout, true);
-            
+
             if ismember(wkey, RespKeys) && ~ButPres
                 ButPres = 1;
                 Response = find(wkey==RespKeys) - 1; % 0 for CW, 1 for CCW
@@ -352,17 +352,17 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
                 AllTrials.RT(trial) = timeStamp - TStamp.event(trial, 11);
                 TStamp.response(trial) = timeStamp;
             end
-            
+
         end
-        
+
         % Retrieve responses from keyboard (to abort run):
-        
+
         if IsOSX
            [keydown, resptime, keyCode] = KbCheck(-1);
         else
            [keydown, resptime, keyCode] = KbCheck;
         end
-        
+
         if keydown  && keyCode(EscKey)
             save(DataFile, 'AllTrials', 'TStamp');
             fprintf('\n\nExperiment terminated at %s, diary closed...\n', datestr(now));
@@ -382,13 +382,13 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             AllTrials.Hit(trial) = Response == (TheseOrients(1)<TheseOrients(2));
             AllTrials.RT(trial) = resptime - TStamp.event(trial, 11);
         end % end of kbcheck
-    
+
     end
-    
+
     %% Feedback (if trial-by-trial)
-    
+
     if strcmp(GiveFeedback, 'Trial')
-       
+
         if AllTrials.Hit(trial) == 1
             FBColor = [0 255 0];
         elseif AllTrials.Hit(trial) == 0
@@ -396,25 +396,25 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
         else % if response not given
             FBColor = Black;
         end
-        
+
         for frame = 1:T.FB
-            
+
             Screen('FillOval', w, FBColor, FixRct);
             Screen('Flip', w);
-            
+
         end
-        
+
     else
-        
+
     end
-    
+
     %% Save files & close textures
-    
+
     tic;
     save(DataFile, 'AllTrials', 'TStamp');
     save(BUpFile); % save everything
     Screen('Close', [Txtrs ProbeTxtrs]);
-    
+
     %% Choose difference intensity (and orientations) for next trial
 
     ThisInt = abs(AllTrials.Diff(trial));
@@ -443,7 +443,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
         AllTrials.Diff(trial + 1), OrientLims(2)), OrientLims(1));
 
     end
-    
+
     %% END TRIAL LOOP
 end
 
@@ -488,4 +488,3 @@ waitforspace; waitfornokey;
 Priority(0);
 sca
 ShowCursor;
-
