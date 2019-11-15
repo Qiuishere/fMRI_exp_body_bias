@@ -202,7 +202,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
 
     % Load bounding box
 
-    BBoxes = dlmread(fullfile(StimDir,[ImgFile '_BBox.txt']));
+    BBoxes = dlmread(fullfile(StimDir_main,[ImgFile '_BBox.txt']));
     %BBoxes = BBoxes(Sequence/5+1,:);
     LargestBox = [min(BBoxes(:,1:2)), max(BBoxes(:,3:4))];
     LargestBox(3:4) = LargestBox(1:2) + LargestBox(3:4); % convert width and height to x-end and y-end
