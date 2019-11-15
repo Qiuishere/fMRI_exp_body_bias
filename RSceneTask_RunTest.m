@@ -358,9 +358,9 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
         % Retrieve responses from keyboard (to abort run):
         
         if IsOSX
-           [keydown, ~, keyCode] = KbCheck(-1);
+           [keydown, resptime, keyCode] = KbCheck(-1);
         else
-           [keydown, ~, keyCode] = KbCheck;
+           [keydown, resptime, keyCode] = KbCheck;
         end
         
         if keydown  && keyCode(EscKey)
@@ -380,7 +380,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             ButPres = 1;
             Response = find(wkey==RespKeys) - 1;
             AllTrials.Hit(trial) = Response == (TheseOrients(1)<TheseOrients(2));
-            % AllTrials.RT
+            AllTrials.RT(trial) = resptime - TStamp.event(trial, 11);
         end % end of kbcheck
     
     end
@@ -452,7 +452,7 @@ end
 save(DataFile, 'AllTrials', 'TStamp');
 save(BUpFile); % save everything
 
-%% EXIT MESSAGE
+%% END OF RUN FEEDBACK
 
 EndTxt = sprintf(['Well done! You completed run %g/%g.\n\n', ...
     'You can take a break while we prepare the next run.'], RunNo, NRuns);
