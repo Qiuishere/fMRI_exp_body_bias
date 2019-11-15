@@ -13,7 +13,7 @@
 %                                                                         %
 %  In this new version, the target always appears after occlusion.        %
 %  We will compare decoding accuracies between expected and unexpected    %
-%  trials.                                                                %      
+%  trials.                                                                %
 %                                                                         %
 %                                                                         %
 %                                                                         %
@@ -50,7 +50,7 @@ SubjNo = input('Please enter participant number:\n');
 Confirm_subj = input(sprintf('\n\nParticipant no. %g. Confirm? [y / n]\n', SubjNo),'s');
 
 if strcmp(Confirm_subj,'n')
-    return; 
+    return;
 elseif ~strcmp(Confirm_subj,'y')
     fprintf('Please enter y or n.\n');
     Confirm_subj = input(sprintf('\n\nParticipant no. %g. Confirm? [y / n]\n', SubjNo),'s');
@@ -78,4 +78,6 @@ RunInfo = [RunNo, numel(Runs), NOccur(RunNo)]; % which run, how many runs in tot
 switch NextRun
     case 'Training'
         RSceneTask_RunTraining(SubjNo, RunInfo, DataDir);
+    case 'Test'
+        RSceneTask_RunTest(SubjNo, RunInfo, DataDir);
 end
