@@ -320,6 +320,10 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
         Screen('Flip', w);
         
         if RealRun
+            
+            [wkey, timeStamp] = BitsiBB.getResponse(timeout, true);
+            
+            if ismember(wkey, RespKeys) && ~ButPres
     
 end
 

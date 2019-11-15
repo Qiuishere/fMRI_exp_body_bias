@@ -38,7 +38,7 @@ end
 % Participant keys
 
 if RealRun
-    RespKeys = [97 98 99]; % INDEX - MIDDLE -RING (R)
+    RespKeys = [97 98]; % INDEX - MIDDLE
     enabledKeys = [RespKeys EscKey SpaceBar];
 else
     if IsWin
