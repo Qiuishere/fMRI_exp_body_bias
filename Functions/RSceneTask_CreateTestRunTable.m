@@ -8,8 +8,8 @@ function AllTrials = RSceneTask_CreateTestRunTable
 % 
 % 
 
-TotNTrials = 320;
-NRuns = 10;
+TotNTrials = 336;
+NRuns = 7;
 TrialsPerRun = TotNTrials/NRuns;
 
 NScenes = 20;
@@ -53,8 +53,10 @@ AllTrials = array2table(AllTrials, 'VariableNames', Variables);
 
 %% Scenes' order:
 
-AllTrials.Scene = repmat((1:NScenes)', TotNTrials/NScenes, 1);
-AllTrials.Scene = AllTrials.Scene(randperm(TotNTrials));
+SceneOrder = repmat((1:NScenes)', ceil(TotNTrials/NScenes), 1);
+SceneOrder = SceneOrder(randperm(length(SceneOrder)));
+
+AllTrials.Scene = SceneOrder(1:TotNTrials);
 
 % Add sequence:
 

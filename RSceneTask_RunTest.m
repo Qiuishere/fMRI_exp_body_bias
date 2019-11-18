@@ -10,7 +10,7 @@ function RSceneTask_RunTest(SubjNo, RunInfo, DataDir)
 global Environment
 global RealRun
 
-RunType = 'Training';
+RunType = 'Test';
 
 RunNo = RunInfo(1);
 NRuns = RunInfo(2);
@@ -58,7 +58,7 @@ Screen('Flip', w);
 
 %% Experimental variables
 
-RunTrials = 32;
+RunTrials = 48;
 
 Views = {'A', 'B'};
 
@@ -456,10 +456,20 @@ save(BUpFile); % save everything
 %% END OF RUN FEEDBACK
 
 if strcmp(GiveFB, 'Run')
+    
+    MeanOrient = mean(abs(AllTrials.Diff(trial-RunTrials+1:trial)));
+    
+    EndTxt = sprintf(['End of run %01d/%01d.\n\nYou were able to', ...
+            ' see\na difference of:\n%.2f degrees.\n\nGood job!'], ...
+            RunNo, NRuns, MeanOrient);
+    
+else
+    
+    EndTxt = sprintf(['Well done! You completed run %g/%g.\n\n', ...
+        'You can take a break while we prepare the next run.'], RunNo, NRuns);
+    
 end
 
-EndTxt = sprintf(['Well done! You completed run %g/%g.\n\n', ...
-    'You can take a break while we prepare the next run.'], RunNo, NRuns);
 DrawFormattedText(w, EndTxt, 'center', 'center', White);
 Screen('Flip', w);
 

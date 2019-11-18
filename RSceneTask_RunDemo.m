@@ -1,4 +1,4 @@
-function RSceneTask_RunTest(SubjNo, RunInfo, DataDir)
+function RSceneTask_RunDemo(SubjNo, RunInfo, DataDir)
 
 %
 %
@@ -10,7 +10,7 @@ function RSceneTask_RunTest(SubjNo, RunInfo, DataDir)
 global Environment
 global RealRun
 
-RunType = 'Training';
+RunType = 'Demo';
 
 RunNo = RunInfo(1);
 NRuns = RunInfo(2);
@@ -58,7 +58,7 @@ Screen('Flip', w);
 
 %% Experimental variables
 
-RunTrials = 32;
+RunTrials = 20;
 
 Views = {'A', 'B'};
 
