@@ -253,6 +253,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
 
             Screen('FillOval', w, White, FixRct);
             Screen('FrameOval', w, Black, FixRct);
+            Screen('Flip', w);
 
         end
     end
@@ -260,7 +261,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
     for stim = 1:length(ThisSeq)
 
         if stim < 5
-            StimFrames = T.Seq(stim);
+            StimFrames = Frames.Seq(stim);
         else
             StimFrames = AllTrials.Jitter(trial);
         end
@@ -306,7 +307,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
 
         if pr == 1
 
-            for frame = 1:T.ISI
+            for frame = 1:Frames.ISI
 
                 Screen('FillOval', w, White, FixRct);
                 Screen('FrameOval', w, Black, FixRct);
@@ -378,7 +379,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             sca; return
         elseif keydown && ~RealRun && any(keyCode(RespKeys)) && ~ButPres
             ButPres = 1;
-            Response = find(wkey==RespKeys) - 1;
+            Response = find(keyCode(RespKeys)) - 1;
             AllTrials.Hit(trial) = Response == (TheseOrients(1)<TheseOrients(2));
             AllTrials.RT(trial) = resptime - TStamp.event(trial, 11);
         end % end of kbcheck
@@ -387,7 +388,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
 
     %% Feedback (if trial-by-trial)
 
-    if strcmp(GiveFeedback, 'Trial')
+    if strcmp(GiveFB, 'Trial')
 
         if AllTrials.Hit(trial) == 1
             FBColor = [0 255 0];
@@ -397,7 +398,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             FBColor = Black;
         end
 
-        for frame = 1:T.FB
+        for frame = 1:Frames.FB
 
             Screen('FillOval', w, FBColor, FixRct);
             Screen('Flip', w);
@@ -453,6 +454,9 @@ save(DataFile, 'AllTrials', 'TStamp');
 save(BUpFile); % save everything
 
 %% END OF RUN FEEDBACK
+
+if strcmp(GiveFB, 'Run')
+end
 
 EndTxt = sprintf(['Well done! You completed run %g/%g.\n\n', ...
     'You can take a break while we prepare the next run.'], RunNo, NRuns);

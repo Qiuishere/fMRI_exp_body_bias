@@ -4,7 +4,7 @@
 %% Feedback
 % 
 
-GiveFB = 'Run'; % Run / Trial / None
+GiveFB = 'Trial'; % Run / Trial / None
 
 %% Size of stuff
 
@@ -49,7 +49,7 @@ switch GiveFB
     case 'Run'
         T.FB = 1.0;
     case 'Trial'
-        %T.FB = 0.25; % timing of trial-by-trial feedback (if given)
+        T.FB = 0.25; % timing of trial-by-trial feedback (if given)
 end
 
 % in frames:
