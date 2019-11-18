@@ -22,15 +22,16 @@ RST_Settings_Test;
 
 %% Set diary and other files
 
-LogDir = fullfile(RunDir,'Logs');
+LogDir = fullfile(RunDir, 'Logs');
 if ~exist(LogDir,'dir')
     mkdir(LogDir);
 end
 
-RunStart = datestr(now,'dd-mm-yyyy_HH-MM-SS');
-diary(fullfile(LogDir,sprintf('Subj%02d_%s_%d_%s.txt', SubjNo, RunType, ThisRunNo, RunStart)));
+RunStart = datestr(now, 'dd-mm-yyyy_HH-MM-SS');
+diary(fullfile(LogDir, sprintf('Subj%02d_%s_%d_%s.txt', SubjNo, RunType, ThisRunNo, RunStart)));
 
 DataFile = fullfile(RunDir, sprintf('Subj%02d_%s_%g.mat', SubjNo, RunType, ThisRunNo));
+AllTrialsFile = fullfile(RunDir, sprintf('Subj%02d_%s_AllTrials.mat', SubjNo, RunType)); 
 
 BUpDir = fullfile(RunDir,'Backup');
 if ~exist(BUpDir,'dir')
@@ -77,11 +78,11 @@ OrientLims = [-10, 10];
 
 %% Load or create trials table:
 
-if exist(DataFile, 'file')
-    load(DataFile);
+if exist(AllTrialsFile, 'file')
+    load(AllTrialsFile);
 else
     AllTrials = RSceneTask_CreateTestRunTable;
-    save(DataFile, 'AllTrials');
+    save(AllTrialsFile, 'AllTrials');
 end
 
 TotNTrials = size(AllTrials, 1);

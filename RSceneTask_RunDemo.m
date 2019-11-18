@@ -23,20 +23,20 @@ RST_Settings_Test;
 %% Set diary and other files
 
 LogDir = fullfile(RunDir,'Logs');
-if ~exist(LogDir,'dir')
+if ~exist(LogDir, 'dir')
     mkdir(LogDir);
 end
 
-RunStart = datestr(now,'dd-mm-yyyy_HH-MM-SS');
-diary(fullfile(LogDir,sprintf('Subj%02d_%s_%d_%s.txt', SubjNo, RunType, ThisRunNo, RunStart)));
+RunStart = datestr(now, 'dd-mm-yyyy_HH-MM-SS');
+diary(fullfile(LogDir,sprintf('Subj%02d_%s_%s.txt', SubjNo, RunType, RunStart)));
 
-DataFile = fullfile(RunDir, sprintf('Subj%02d_%s_%g.mat', SubjNo, RunType, ThisRunNo));
+DataFile = fullfile(RunDir, sprintf('Subj%02d_%s.mat', SubjNo, RunType));
 
-BUpDir = fullfile(RunDir,'Backup');
+BUpDir = fullfile(RunDir, 'Backup');
 if ~exist(BUpDir,'dir')
     mkdir(BUpDir);
 end
-BUpFile = fullfile(BUpDir, sprintf('Subj%02d_%s_%g_%s.mat', SubjNo, RunType, ThisRunNo, RunStart));
+BUpFile = fullfile(BUpDir, sprintf('Subj%02d_%s_%s.mat', SubjNo, RunType, RunStart));
 
 %% Get and report flip interval, and compensate waiting times in settings
 
@@ -50,7 +50,7 @@ end
 %% Message
 % while loading images and waiting for scanner trigger
 
-InstrTxt = sprintf('Run %g/%g\n\nDoes the object turn\nclockwise or counterclockwise?', RunNo, NRuns);
+InstrTxt = 'Practice run\n\nDoes the object turn\nclockwise or counterclockwise?';
 
 DrawFormattedText(w, InstrTxt, 'center', 'center', White);
 
@@ -75,79 +75,60 @@ Step_Size = 0.5;
 NDown = 2;
 OrientLims = [-10, 10];
 
-%% Load or create trials table:
+%% Create stupid trials table:
 
-if exist(DataFile, 'file')
-    load(DataFile);
+Variables = {'Scene', 'InitView', 'FinalView', 'Diff', ...
+    'Orients', 'Hit', 'RT'};
+
+% Automatically if trials are evenly split between initial views, and then
+% between final views, half will be wide and half narrow.
+
+AllTrials = nan(RunTrials, numel(Variables));
+
+AllTrials(:, 2) = randi(2, RunTrials, 1);
+AllTrials(:, 3) = ones(RunTrials, 1) * 30 + (rand(RunTrials, 1)>0.5) * 60;
+
+AllTrials = array2table(AllTrials, 'VariableNames', Variables);
+
+AllTrials.Scene = randi(NScenes, RunTrials, 1);
+
+AllTrials = AllTrials(randperm(RunTrials), :);
+
+% Add sequence:
+
+Seq = nan(RunTrials, 5);
+
+Seq(:, 1) = 0;
+for i = 1:RunTrials
+    if AllTrials.FinalView(i)==30, Limit = 25; else Limit = 60; end
+    Seq(i, 2:4) = sort(randsample(15:5:Limit, 3));
+end
+Seq(:, 5) = AllTrials.FinalView;
+
+AllTrials.Sequence = num2cell(Seq, 2);
+
+%% Assign initial difference
+
+if rand > 0.5
+    AllTrials.Diff(1) = Diff_Start;
 else
-    AllTrials = RSceneTask_CreateTestRunTable;
-    save(DataFile, 'AllTrials');
+    AllTrials.Diff(1) = -Diff_Start;
 end
 
-TotNTrials = size(AllTrials, 1);
+AllTrials.Orients = num2cell(AllTrials.Orients);
 
-%% Assign initial difference (if not already done)
+% Decide orientations in the first trial based on initial difference:
+AllTrials.Orients{1}(1) = round(normrnd(0, 1));
+AllTrials.Orients{1}(2) = max(min(AllTrials.Orients{1}(1) + AllTrials.Diff(1), ...
+    OrientLims(2)), OrientLims(1));
 
-if ThisRunNo == 1
+% Random jitter before target onset:
+AllJitter = rand(RunTrials, 1) * 0.5;
+AllTrials.Jitter = Frames.Seq(5) - round(AllJitter/ifi);
 
-    if rand > 0.5
-        AllTrials.Diff(1) = Diff_Start;
-    else
-        AllTrials.Diff(1) = -Diff_Start;
-    end
+% Determine fixation time taking jitter into account
+AllTrials.Fix = Frames.Fix - round((0.5 - AllJitter)/ifi);
 
-    AllTrials.Orients = num2cell(AllTrials.Orients);
-
-    % Decide orientations in the first trial based on initial difference:
-    AllTrials.Orients{1}(1) = round(normrnd(0, 1));
-    AllTrials.Orients{1}(2) = max(min(AllTrials.Orients{1}(1) + AllTrials.Diff(1), ...
-        OrientLims(2)), OrientLims(1));
-
-    % Random jitter before target onset:
-    AllJitter = rand(TotNTrials, 1) * 0.5;
-    AllTrials.Jitter = Frames.Seq(5) - round(AllJitter/ifi);
-
-    % Determine fixation time taking jitter into account
-    AllTrials.Fix = Frames.Fix - round((0.5 - AllJitter)/ifi);
-
-end
-
-%% Create structure to save timestamps
-
-TStamp = struct;
-
-TStamp.trigger = NaN;
-TStamp.event = nan(RunTrials, length(TrialSequence) + 1); % the '+ 1' is the response time
-TStamp.response = nan(RunTrials, 1);
-
-%% Scanner trigger
-
-if RealRun
-
-    warning('Waiting for scanner trigger...');
-
-    BitsiScanner.clearResponses();
-    firstScan = 0;
-
-    while firstScan == 0
-        while BitsiScanner.numberOfResponses() == 0
-            WaitSecs(0.001);
-        end
-        [resp] = BitsiScanner.getResponse(0.001, true);
-        if resp == 97
-            firstScan = 1;
-        end
-    end
-
-else
-    warning('Sham run: press spacebar to continue.');
-    waitforspace; waitfornokey;
-end
-
-% start (sham) scanning
-TStamp.trigger = GetSecs;
-
-fprintf('\n SCANNER TRIGGER (test run %g): %s \n', ThisRunNo, datestr(now,'dd-mm-yyyy HH:MM:SS'));
 
 %% Fixation
 
@@ -429,7 +410,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
         Int_next = ThisInt;
     end
 
-    if trial ~= TotNTrials
+    if trial ~= RunTrials
 
         if rand > 0.5
             AllTrials.Diff(trial + 1) = Int_next;
