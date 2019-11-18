@@ -148,9 +148,7 @@ tic;
 % TRIAL LOOP
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-FirstTrial = (ThisRunNo - 1) * RunTrials + 1;
-
-for trial = FirstTrial:FirstTrial + RunTrials - 1
+for trial = 1:RunTrials
 
     fprintf('--- TRIAL %g/%g ---\n', trial, RunTrials);
 
@@ -436,11 +434,12 @@ save(BUpFile); % save everything
 
 %% END OF RUN FEEDBACK
 
-if strcmp(GiveFB, 'Run')
-end
+MeanOrient = mean(abs(AllTrials.Diff(trial-RunTrials+1:trial)));
 
-EndTxt = sprintf(['Well done! You completed run %g/%g.\n\n', ...
-    'You can take a break while we prepare the next run.'], RunNo, NRuns);
+EndTxt = sprintf(['End of run %01d/%01d.\n\nYou were able to', ...
+    ' see\na difference of:\n%.2f degrees.\n\nGood job!'], ...
+    RunNo, NRuns, MeanOrient);
+
 DrawFormattedText(w, EndTxt, 'center', 'center', White);
 Screen('Flip', w);
 
