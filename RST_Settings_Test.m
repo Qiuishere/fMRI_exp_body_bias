@@ -4,7 +4,7 @@
 %% Feedback
 % 
 
-GiveFB = 'Trial'; % Run / Trial / None
+GiveFB = 'Run'; % Run / Trial / None
 
 %% Size of stuff
 

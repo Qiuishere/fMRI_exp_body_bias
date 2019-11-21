@@ -344,8 +344,10 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
 
     for frame = 1:Frames.Resp
 
-        Screen('FillOval', w, White, FixRct);
-        Screen('FrameOval', w, Black, FixRct);
+        if ~ButPres
+            Screen('FillOval', w, White, FixRct);
+            Screen('FrameOval', w, Black, FixRct);
+        end
         tnow = Screen('Flip', w);
 
         if frame == 1
@@ -391,35 +393,36 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             sca; return
         elseif keydown && ~RealRun && any(keyCode(RespKeys)) && ~ButPres
             ButPres = 1;
-            Response = find(keyCode(RespKeys)) - 1;
+            Response = find(keyCode(RespKeys));
             AllTrials.Hit(trial) = Response == (TheseOrients(1)<TheseOrients(2));
             AllTrials.RT(trial) = resptime - TStamp.event(trial, 11);
         end % end of kbcheck
 
     end
-
+    
     %% Feedback (if trial-by-trial)
+    % IF YOU USE THIS SUBTRACT FROM TIMING!
 
-    if strcmp(GiveFB, 'Trial')
-
-        if AllTrials.Hit(trial) == 1
-            FBColor = [0 255 0];
-        elseif AllTrials.Hit(trial) == 0
-            FBColor = [255 0 0];
-        else % if response not given
-            FBColor = Black;
-        end
-
-        for frame = 1:Frames.TrialFB
-
-            Screen('FillOval', w, FBColor, FixRct);
-            Screen('Flip', w);
-
-        end
-
-    else
-
-    end
+%     if strcmp(GiveFB, 'Trial')
+% 
+%         if AllTrials.Hit(trial) == 1
+%             FBColor = [0 255 0];
+%         elseif AllTrials.Hit(trial) == 0
+%             FBColor = [255 0 0];
+%         else % if response not given
+%             FBColor = Black;
+%         end
+% 
+%         for frame = 1:Frames.TrialFB
+% 
+%             Screen('FillOval', w, FBColor, FixRct);
+%             Screen('Flip', w);
+% 
+%         end
+% 
+%     else
+% 
+%     end
 
     %% Save files & close textures
 
@@ -456,6 +459,16 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
         AllTrials.Diff(trial + 1), OrientLims(2)), OrientLims(1));
 
     end
+    
+    %% SHOW SUBJECT'S RESPONSE
+    
+    if ~isnan(AllTrials.Hit(trial))
+        fprintf('Difference: %.1f, Hit: %g, RT: %.3f\n', ...
+            ThisInt, AllTrials.Hit(trial), AllTrials.RT(trial));
+    else
+        fprintf('Response not given.\n');
+    end
+
 
     %% END TRIAL LOOP
 end
@@ -484,7 +497,41 @@ end
 
 DrawFormattedText(w, EndTxt, 'center', 'center', White);
 Screen('Flip', w);
+fprintf('\n\nAverage orientation difference: %.2f degrees.\n\n', MeanOrient);
 WaitSecs(T.RunFB);
+
+%% Plot
+
+tic;
+
+figure;
+subplot(2, 2, 1:2);
+plot(abs(AllTrials.Diff), 'b', 'LineWidth', 2);
+hold on
+plot([1 TotNTrials], [mean(abs(AllTrials.Diff)) mean(abs(AllTrials.Diff))], 'r--', ...
+    'LineWidth', 2);
+set(gca, 'ylim', [0 max(abs(AllTrials.Diff)) + 2]);
+set(gca, 'xlim', [1 TotNTrials]);
+
+subplot(2, 2, 3);
+bar(1, mean(AllTrials.Hit(AllTrials.Consistent==1)), 'r');
+hold on
+errorbar(1, nanmean(AllTrials.Hit(AllTrials.Consistent==1)), ...
+    nanstd(AllTrials.Hit(AllTrials.Consistent==1)/sqrt(trial)), 'k', 'LineWidth', 1);
+bar(2, nanmean(AllTrials.Hit(AllTrials.Consistent==0)), 'b');
+errorbar(2, nanmean(AllTrials.Hit(AllTrials.Consistent==0)), ...
+    nanstd(AllTrials.Hit(AllTrials.Consistent==0)/sqrt(trial)), 'k', 'LineWidth', 1);
+set(gca, 'ylim', [0 1.5]);
+
+subplot(2, 2, 4);
+bar(1, nanmean(AllTrials.RT(AllTrials.Consistent==1)), 'r');
+hold on
+errorbar(1, nanmean(AllTrials.RT(AllTrials.Consistent==1)), ...
+    nanstd(AllTrials.RT(AllTrials.Consistent==1))/sqrt(trial), 'k', 'LineWidth', 1);
+bar(2, nanmean(AllTrials.RT(AllTrials.Consistent==0)), 'b');
+errorbar(2, nanmean(AllTrials.RT(AllTrials.Consistent==0)), ...
+    nanstd(AllTrials.RT(AllTrials.Consistent==0)/sqrt(trial)), 'k', 'LineWidth', 1);
+set(gca, 'ylim', [0.0 1.5]);
 
 %% fixation time at end of run
 
@@ -493,7 +540,7 @@ Screen('FrameOval', w, Black, FixRct);
 Screen('Flip', w);
 
 fprintf('\n\nWaiting for the run to end in %g seconds', round(T.Delay));
-WaitSecs(T.Delay);
+WaitSecs(T.Delay - toc);
 tic;
 
 %% MONITOR STIMULUS PRESENTATION
@@ -533,35 +580,6 @@ Priority(0);
 sca
 ShowCursor;
 
-%% Plot
 
-figure;
-subplot(2, 2, 1:2);
-plot(abs(AllTrials.Diff), 'b', 'LineWidth', 2);
-hold on
-plot([1 TotNTrials], [mean(abs(AllTrials.Diff)) mean(abs(AllTrials.Diff))], 'r--', ...
-    'LineWidth', 2);
-set(gca, 'ylim', [0 max(abs(AllTrials.Diff)) + 2]);
-set(gca, 'xlim', [1 TotNTrials]);
-
-subplot(2, 2, 3);
-bar(1, mean(AllTrials.Hit(AllTrials.Consistent==1)), 'r');
-hold on
-errorbar(1, mean(AllTrials.Hit(AllTrials.Consistent==1)), ...
-    std(AllTrials.Hit(AllTrials.Consistent==1)/sqrt(TotNTrials)), 'k', 'LineWidth', 1);
-bar(2, mean(AllTrials.Hit(AllTrials.Consistent==0)), 'b');
-errorbar(2, mean(AllTrials.Hit(AllTrials.Consistent==0)), ...
-    std(AllTrials.Hit(AllTrials.Consistent==0)/sqrt(TotNTrials)), 'k', 'LineWidth', 1);
-set(gca, 'ylim', [0 1.5]);
-
-subplot(2, 2, 4);
-bar(1, mean(AllTrials.RT(AllTrials.Consistent==1)), 'r');
-hold on
-errorbar(1, mean(AllTrials.RT(AllTrials.Consistent==1)), ...
-    std(AllTrials.RT(AllTrials.Consistent==1))/sqrt(TotNTrials), 'k', 'LineWidth', 1);
-bar(2, mean(AllTrials.RT(AllTrials.Consistent==0)), 'b');
-errorbar(2, mean(AllTrials.RT(AllTrials.Consistent==0)), ...
-    std(AllTrials.RT(AllTrials.Consistent==0)/sqrt(TotNTrials)), 'k', 'LineWidth', 1);
-set(gca, 'ylim', [0.0 1.5]);
 
 

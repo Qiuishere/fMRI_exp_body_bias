@@ -8,7 +8,7 @@
 %
 
 if ~RealRun
-    PsychDebugWindowConfiguration;
+    %PsychDebugWindowConfiguration;
 end
 
 %% Visual context
