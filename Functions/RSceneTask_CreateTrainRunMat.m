@@ -19,7 +19,7 @@ TotNTrials = 360;
 NStimuli = 20;
 NTargets = 10; % how many targets per stimulus type
 
-BlockSize = 9; % how many trials in a mini-block 
+BlockSize = 18; % how many trials in a mini-block 
 
 TrialMatrix = zeros(NStimTypes, TotNTrials/NStimTypes);
 TargetTrials = TrialMatrix; % where repetition occurs (and subject should respond)

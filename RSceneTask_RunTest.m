@@ -157,12 +157,23 @@ Screen('FrameOval', w, Black, FixRct);
 Screen('Flip', w);
 
 fprintf('Waiting for the task to begin in %g seconds...\n', round(T.Delay));
-WaitSecs(T.Delay);
+WaitSecs(T.Delay - (3 * T.Count));
+
+%% COUNTDOWN
+
+for n = 1:3
+    
+    CountDownTxt = sprintf('Starting in %g', 4 - n);
+    DrawFormattedText(w, CountDownTxt, 'center', 'center', White);
+    Screen('FillOval', w, White, FixRct);
+    Screen('FrameOval', w, Black, FixRct);
+    Screen('Flip',w);
+    WaitSecs(T.Count);
+    
+end
 
 % Check loading time to subtract from ITI
 tic;
-
-%% COUNTDOWN?
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TRIAL LOOP
@@ -399,7 +410,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             FBColor = Black;
         end
 
-        for frame = 1:Frames.FB
+        for frame = 1:Frames.TrialFB
 
             Screen('FillOval', w, FBColor, FixRct);
             Screen('Flip', w);
@@ -473,6 +484,26 @@ end
 
 DrawFormattedText(w, EndTxt, 'center', 'center', White);
 Screen('Flip', w);
+WaitSecs(T.RunFB);
+
+%% fixation time at end of run
+
+Screen('FillOval',w, White, FixRct);
+Screen('FrameOval', w, Black, FixRct);
+Screen('Flip', w);
+
+fprintf('\n\nWaiting for the run to end in %g seconds', round(T.Delay));
+WaitSecs(T.Delay);
+tic;
+
+%% MONITOR STIMULUS PRESENTATION
+
+% Run duration
+CompDur = round((T.Delay * 2) + (T.Count * 3) + ...
+    (TrialSet * RunTrials) + ...
+    (strcmp(GiveFB, 'Run') * T.RunFB) - toc);
+RealDur = round(GetSecs - TStamp.trigger);
+fprintf('\nRUN DURATION: %g seconds (expected duration: %g seconds). \n\n', RealDur, CompDur);
 
 %% CLEAN UP
 
@@ -501,3 +532,36 @@ waitforspace; waitfornokey;
 Priority(0);
 sca
 ShowCursor;
+
+%% Plot
+
+figure;
+subplot(2, 2, 1:2);
+plot(abs(AllTrials.Diff), 'b', 'LineWidth', 2);
+hold on
+plot([1 TotNTrials], [mean(abs(AllTrials.Diff)) mean(abs(AllTrials.Diff))], 'r--', ...
+    'LineWidth', 2);
+set(gca, 'ylim', [0 max(abs(AllTrials.Diff)) + 2]);
+set(gca, 'xlim', [1 TotNTrials]);
+
+subplot(2, 2, 3);
+bar(1, mean(AllTrials.Hit(AllTrials.Consistent==1)), 'r');
+hold on
+errorbar(1, mean(AllTrials.Hit(AllTrials.Consistent==1)), ...
+    std(AllTrials.Hit(AllTrials.Consistent==1)/sqrt(TotNTrials)), 'k', 'LineWidth', 1);
+bar(2, mean(AllTrials.Hit(AllTrials.Consistent==0)), 'b');
+errorbar(2, mean(AllTrials.Hit(AllTrials.Consistent==0)), ...
+    std(AllTrials.Hit(AllTrials.Consistent==0)/sqrt(TotNTrials)), 'k', 'LineWidth', 1);
+set(gca, 'ylim', [0 1.5]);
+
+subplot(2, 2, 4);
+bar(1, mean(AllTrials.RT(AllTrials.Consistent==1)), 'r');
+hold on
+errorbar(1, mean(AllTrials.RT(AllTrials.Consistent==1)), ...
+    std(AllTrials.RT(AllTrials.Consistent==1))/sqrt(TotNTrials), 'k', 'LineWidth', 1);
+bar(2, mean(AllTrials.RT(AllTrials.Consistent==0)), 'b');
+errorbar(2, mean(AllTrials.RT(AllTrials.Consistent==0)), ...
+    std(AllTrials.RT(AllTrials.Consistent==0)/sqrt(TotNTrials)), 'k', 'LineWidth', 1);
+set(gca, 'ylim', [0.0 1.5]);
+
+

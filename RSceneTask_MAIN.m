@@ -29,7 +29,7 @@ addpath(genpath('Functions'));
 StartUp;
 
 global Environment
-Environment = 1; % 1 - office, 2 - dummy, 3 - prismafit
+Environment = 1; % 1 - office, 2 - dummy/skyra, 3 - prismafit (new screen)
 
 global RealRun
 RealRun = Environment == 2 || Environment == 3;
@@ -40,6 +40,20 @@ if RealRun, DataDir = 'Data_Lab'; else, DataDir = 'Data_Demo'; end
 
 %% List of experiment runs
 % Test, Training, Localizer, Demo
+
+% Runs = {'Demo', ...
+%         'Test', ...
+%         'Test', ...
+%         'Training', ...
+%         'Localizer', ...
+%         'Test', ...
+%         'Test', ...
+%         'Training', ...
+%         'Test', ...
+%         'Test', ...
+%         'Training', ...
+%         'Localizer', ...
+%         'Test'};
 
 Runs = {'Test'};
 
@@ -76,8 +90,16 @@ RunInfo = [RunNo, numel(Runs), NOccur(RunNo)]; % which run, how many runs in tot
 %% Run experiment
 
 switch NextRun
-    case 'Training'
-        RSceneTask_RunTraining(SubjNo, RunInfo, DataDir);
+    case 'Demo'
+        RSceneTask_RunDemo(SubjNo, RunInfo, DataDir);
     case 'Test'
         RSceneTask_RunTest(SubjNo, RunInfo, DataDir);
+    case 'Training'
+        RSceneTask_RunTraining(SubjNo, RunInfo, DataDir);
+    case 'Localizer'
+        Run_Localizer(SubjNo, RunInfo, DataDir);
 end
+
+%% Shutdown
+
+clearvars; sca; ShowCursor;

@@ -70,13 +70,13 @@ assert(size(TrialMatrix, 1) == NStimTypes && size(TargetTrials, 1) == NStimTypes
 
 % Determine order of stimulus types:
 
-StimTypes = zeros(1, 40); % what stimulus types in what mini-blocks
+StimTypes = zeros(1, 20); % what stimulus types in what mini-blocks
 StillToDo = ones(1, NStimTypes); % stimulus types still to assign
 
 StimTypes(1) = randi(NStimTypes);
 StillToDo(StimTypes(1)) = 0;
 
-for i = 2:40
+for i = 2:20
     
     ChooseFrom = find(StillToDo);
     ChooseFrom = ChooseFrom(randperm(length(ChooseFrom)));
@@ -97,14 +97,16 @@ Variables = {'Type', 'Stimulus', 'Target', 'Response'};
 AllTrials = nan(RunTrials, numel(Variables));
 AllTrials = array2table(AllTrials, 'VariableNames', Variables);
 
+BlockSize = 18;
+
 for i = 1:RunTrials
     
-    if rem(i, 9) == 1 % new mini-block
-        whichtype = ceil(i/9);
-        AllTrials.Type(i:i+8) = StimTypes(whichtype);
+    if rem(i, BlockSize) == 1 % new mini-block
+        whichtype = ceil(i/BlockSize);
+        AllTrials.Type(i:i+BlockSize-1) = StimTypes(whichtype);
         TypeRep = sum(StimTypes(1:whichtype)==StimTypes(whichtype));
-        AllTrials.Stimulus(i:i+8) = TrialMatrix(StimTypes(whichtype), (TypeRep-1)*9+1:(TypeRep-1)*9+9);
-        AllTrials.Target(i:i+8) = TargetTrials(StimTypes(whichtype), (TypeRep-1)*9+1:(TypeRep-1)*9+9);
+        AllTrials.Stimulus(i:i+BlockSize-1) = TrialMatrix(StimTypes(whichtype), (TypeRep-1)*BlockSize+1:(TypeRep-1)*BlockSize+BlockSize);
+        AllTrials.Target(i:i+BlockSize-1) = TargetTrials(StimTypes(whichtype), (TypeRep-1)*BlockSize+1:(TypeRep-1)*BlockSize+BlockSize);
     end
     
 end
@@ -145,7 +147,7 @@ end
 
 %% Load images for first group of blocks
 
-thisblock = 1:72; % 8 mini-blocks of 9 stimuli each
+thisblock = 1:72; % 4 mini-blocks of 18 stimuli each
 
 for i = thisblock
     
@@ -203,9 +205,20 @@ Screen('FrameOval', w, Black, FixRct);
 Screen('Flip', w);
 
 fprintf('Waiting for the task to begin in %g seconds...\n', round(T.Delay));
-WaitSecs(T.Delay);
+WaitSecs(T.Delay - (3 * T.Count));
 
 %% COUNTDOWN?
+
+for n = 1:3
+    
+    CountDownTxt = sprintf('Starting in %g', 4 - n);
+    DrawFormattedText(w, CountDownTxt, 'center', 'center', White);
+    Screen('FillOval', w, White, FixRct);
+    Screen('FrameOval', w, Black, FixRct);
+    Screen('Flip',w);
+    WaitSecs(T.Count);
+    
+end
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TRIAL LOOP

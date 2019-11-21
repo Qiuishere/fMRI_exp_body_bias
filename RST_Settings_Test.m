@@ -45,12 +45,10 @@ T.PreRespDelay = 0.05; % very short pause before response screen
 T.Resp = 1.5; % max. time to give a response
 
 T.Delay = 15.0; % at the start and end of run
-switch GiveFB
-    case 'Run'
-        T.FB = 1.0;
-    case 'Trial'
-        T.FB = 0.25; % timing of trial-by-trial feedback (if given)
-end
+T.Count = 0.8;
+
+T.RunFB = 2.0;
+T.TrialFB = 0.25; % timing of trial-by-trial feedback (if given)
 
 % in frames:
 
