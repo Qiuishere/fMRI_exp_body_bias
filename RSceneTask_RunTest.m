@@ -362,7 +362,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
 
             if ismember(wkey, RespKeys) && ~ButPres
                 ButPres = 1;
-                Response = find(wkey==RespKeys) - 1; % 0 for CW, 1 for CCW
+                Response = 2 - find(wkey==RespKeys); % 1 for CW, 0 for CCW
                 AllTrials.Hit(trial) = Response == (TheseOrients(1)<TheseOrients(2));
                 AllTrials.RT(trial) = timeStamp - TStamp.event(trial, 11);
                 TStamp.response(trial) = timeStamp;
@@ -393,7 +393,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             sca; return
         elseif keydown && ~RealRun && any(keyCode(RespKeys)) && ~ButPres
             ButPres = 1;
-            Response = find(keyCode(RespKeys));
+            Response = 2 - find(keyCode(RespKeys));
             AllTrials.Hit(trial) = Response == (TheseOrients(1)<TheseOrients(2));
             AllTrials.RT(trial) = resptime - TStamp.event(trial, 11);
         end % end of kbcheck

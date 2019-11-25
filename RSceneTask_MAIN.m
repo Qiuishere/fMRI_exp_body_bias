@@ -56,7 +56,7 @@ if RealRun, DataDir = 'Data_Lab'; else, DataDir = 'Data_Demo'; end
 %         'Localizer', ...
 %         'Test'};
 
-Runs = {'Test'};
+Runs = {'Demo'};
 
 %% Participant info
 

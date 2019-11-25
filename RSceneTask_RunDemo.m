@@ -28,9 +28,9 @@ if ~exist(LogDir, 'dir')
 end
 
 RunStart = datestr(now, 'dd-mm-yyyy_HH-MM-SS');
-diary(fullfile(LogDir,sprintf('Subj%02d_%s_%s.txt', SubjNo, RunType, RunStart)));
+diary(fullfile(LogDir,sprintf('Subj%02d_%s_%d_%s.txt', SubjNo, RunType, ThisRunNo, RunStart)));
 
-DataFile = fullfile(RunDir, sprintf('Subj%02d_%s.mat', SubjNo, RunType));
+DataFile = fullfile(RunDir, sprintf('Subj%02d_%s_%g.mat', SubjNo, RunType, ThisRunNo));
 
 BUpDir = fullfile(RunDir, 'Backup');
 if ~exist(BUpDir,'dir')
@@ -56,6 +56,8 @@ DrawFormattedText(w, InstrTxt, 'center', 'center', White);
 
 Screen('Flip', w);
 
+WaitSecs(3.0);
+
 %% Experimental variables
 
 RunTrials = 20;
@@ -76,6 +78,8 @@ NDown = 2;
 OrientLims = [-10, 10];
 
 %% Create stupid trials table:
+
+NScenes = 20;
 
 Variables = {'Scene', 'InitView', 'FinalView', 'Diff', ...
     'Orients', 'Hit', 'RT'};
@@ -129,26 +133,15 @@ AllTrials.Jitter = Frames.Seq(5) - round(AllJitter/ifi);
 % Determine fixation time taking jitter into account
 AllTrials.Fix = Frames.Fix - round((0.5 - AllJitter)/ifi);
 
+%% Check loading time to subtract from ITI
 
-%% Fixation
-
-Screen('FillOval', w, White, FixRct);
-Screen('FrameOval', w, Black, FixRct);
-Screen('Flip', w);
-
-fprintf('Waiting for the task to begin in %g seconds...\n', round(T.Delay));
-WaitSecs(T.Delay);
-
-% Check loading time to subtract from ITI
 tic;
 
 %% LOAD ARROWS FOR ILLUSTRATION
 
-[Im_CW, ~, Alpha_CW] = imread('Arrow_CW_black.png');
-[Im_CCW, ~, Alpha_CCW] = imread('Arrow_CCW_black.png');
+[CWorCCW_im, ~, CWorCCW_alpha] = imread('CWorCCW.png');
 
-ArrowTxt(1) = Screen('MakeTexture', w, cat(3, Im_CW, Alpha_CW));
-ArrowTxt(2) = Screen('MakeTexture', w, cat(3, Im_CCW, Alpha_CCW));
+CWorCCW_txtr = Screen('MakeTexture', w, cat(3, CWorCCW_im, CWorCCW_alpha));
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TRIAL LOOP
@@ -167,7 +160,7 @@ for trial = 1:RunTrials
     % Start ITI
     Screen('FillOval', w, White, FixRct);
     Screen('FrameOval', w, Black, FixRct);
-    TStamp.event(trial, 1) = Screen('Flip', w);
+    Screen('Flip', w);
 
     %% Load images, create textures
 
@@ -200,12 +193,6 @@ for trial = 1:RunTrials
 
     %% Load two probes
 
-    if AllTrials.Consistent(trial)
-        ProbeView = Views{AllTrials.InitView(trial)};
-    else
-        ProbeView = Views{3 - AllTrials.InitView(trial)};
-    end
-
     TheseOrients = AllTrials.Orients(trial);
     TheseOrients = TheseOrients{1};
 
@@ -218,7 +205,7 @@ for trial = 1:RunTrials
         end
 
         ProbeFile = fullfile(StimDir_rot, sprintf('Scene%g%c_%04d_%.1f.png', ...
-            AllTrials.Scene(trial), ProbeView, ...
+            AllTrials.Scene(trial), Views{AllTrials.InitView(trial)}, ...
             AllTrials.FinalView(trial), TheseOrients(i)));
 
         ThisImg = double(imread(ProbeFile));
@@ -259,12 +246,8 @@ for trial = 1:RunTrials
             end
             Screen('FillOval', w, White, FixRct);
             Screen('FrameOval', w, Black, FixRct);
-            tnow = Screen('Flip', w);
-
-            if frame == 1
-                TStamp.event(trial, stim + 1) = tnow;
-            end
-
+            Screen('Flip', w);
+            
         end
 
     end
@@ -278,15 +261,7 @@ for trial = 1:RunTrials
             Screen('DrawTexture', w, ProbeTxtrs(pr), [], ImRect);
             Screen('FillOval', w, White, FixRct);
             Screen('FrameOval', w, Black, FixRct);
-            tnow = Screen('Flip', w);
-
-            if frame == 1
-                if pr == 1
-                    TStamp.event(trial, 7) = tnow;
-                elseif pr == 2
-                    TStamp.event(trial, 9) = tnow;
-                end
-            end
+            Screen('Flip', w);
 
         end
 
@@ -296,11 +271,7 @@ for trial = 1:RunTrials
 
                 Screen('FillOval', w, White, FixRct);
                 Screen('FrameOval', w, Black, FixRct);
-                tnow = Screen('Flip', w);
-
-                if frame == 1
-                    TStamp.event(trial, 8) = tnow;
-                end
+                Screen('Flip', w);
 
             end
 
@@ -308,22 +279,21 @@ for trial = 1:RunTrials
 
     end
 
-    TStamp.event(trial, 10) = Screen('Flip', w);
     WaitSecs(T.PreRespDelay);
 
     %% Get response
 
     ButPres = 0;
 
-    for frame = 1:Frames.Resp
+    t0 = GetSecs;
+    
+    while ~ButPres
 
-        DrawFormattedText(w, 'CW or CCW?', 'center', 'center', White);
-        sgtext(w, 'Clockwise', 
-        tnow = Screen('Flip', w);
-
-        if frame == 1
-            TStamp.event(trial, 11) = tnow;
-        end
+        DrawFormattedText(w, 'Clockwise or Counterclockwise?', 'center', 'center', White);
+        %sgtext(w, 'Clockwise or Counterclockwise?', windowRect, 48, 'Helvetica', White, [0, -100]);
+        %Screen('DrawTexture', w, CWorCCW_txtr, [], ImRect);
+        
+        Screen('Flip', w);
 
         % Response from button box:
 
@@ -333,10 +303,9 @@ for trial = 1:RunTrials
 
             if ismember(wkey, RespKeys) && ~ButPres
                 ButPres = 1;
-                Response = find(wkey==RespKeys) - 1; % 0 for CW, 1 for CCW
+                Response = 2 - find(wkey==RespKeys); % 0 for CW, 1 for CCW
                 AllTrials.Hit(trial) = Response == (TheseOrients(1)<TheseOrients(2));
-                AllTrials.RT(trial) = timeStamp - TStamp.event(trial, 11);
-                TStamp.response(trial) = timeStamp;
+                AllTrials.RT(trial) = timeStamp - t0;
             end
 
         end
@@ -350,7 +319,7 @@ for trial = 1:RunTrials
         end
 
         if keydown  && keyCode(EscKey)
-            save(DataFile, 'AllTrials', 'TStamp');
+            save(DataFile, 'AllTrials');
             fprintf('\n\nExperiment terminated at %s, diary closed...\n', datestr(now));
             if RealRun
                 close(BitsiScanner);
@@ -364,40 +333,34 @@ for trial = 1:RunTrials
             sca; return
         elseif keydown && ~RealRun && any(keyCode(RespKeys)) && ~ButPres
             ButPres = 1;
-            Response = find(keyCode(RespKeys)) - 1;
+            Response = 2 - find(keyCode(RespKeys));
             AllTrials.Hit(trial) = Response == (TheseOrients(1)<TheseOrients(2));
-            AllTrials.RT(trial) = resptime - TStamp.event(trial, 11);
+            AllTrials.RT(trial) = resptime - t0;
         end % end of kbcheck
 
     end
 
-    %% Feedback (if trial-by-trial)
+    %% Feedback
 
-    if strcmp(GiveFB, 'Trial')
-
-        if AllTrials.Hit(trial) == 1
-            FBColor = [0 255 0];
-        elseif AllTrials.Hit(trial) == 0
-            FBColor = [255 0 0];
-        else % if response not given
-            FBColor = Black;
-        end
-
-        for frame = 1:Frames.FB
-
-            Screen('FillOval', w, FBColor, FixRct);
-            Screen('Flip', w);
-
-        end
-
-    else
-
+    if AllTrials.Hit(trial) == 1
+        FBColor = [0 255 0];
+    elseif AllTrials.Hit(trial) == 0
+        FBColor = [255 0 0];
+    else % if response not given
+        FBColor = Black;
+    end
+    
+    for frame = 1:Frames.TrialFB
+        
+        Screen('FillOval', w, FBColor, FixRct);
+        Screen('Flip', w);
+        
     end
 
     %% Save files & close textures
 
     tic;
-    save(DataFile, 'AllTrials', 'TStamp');
+    save(DataFile, 'AllTrials');
     save(BUpFile); % save everything
     Screen('Close', [Txtrs ProbeTxtrs]);
 
@@ -430,21 +393,30 @@ for trial = 1:RunTrials
 
     end
 
+    %% SHOW SUBJECT'S RESPONSE
+    
+    if ~isnan(AllTrials.Hit(trial))
+        fprintf('Difference: %.1f, Hit: %g, RT: %.3f\n', ...
+            ThisInt, AllTrials.Hit(trial), AllTrials.RT(trial));
+    else
+        fprintf('Response not given.\n');
+    end
+    
     %% END TRIAL LOOP
 end
 
 %% SAVE FILES
 
-save(DataFile, 'AllTrials', 'TStamp');
+save(DataFile, 'AllTrials');
 save(BUpFile); % save everything
 
 %% END OF RUN FEEDBACK
 
 MeanOrient = mean(abs(AllTrials.Diff(trial-RunTrials+1:trial)));
 
-EndTxt = sprintf(['End of run %01d/%01d.\n\nYou were able to', ...
+EndTxt = sprintf(['End of practice run.\n\nYou were able to', ...
     ' see\na difference of:\n%.2f degrees.\n\nGood job!'], ...
-    RunNo, NRuns, MeanOrient);
+    MeanOrient);
 
 DrawFormattedText(w, EndTxt, 'center', 'center', White);
 Screen('Flip', w);
