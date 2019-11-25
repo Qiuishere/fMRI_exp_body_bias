@@ -38,7 +38,7 @@ end
 T.Fix = 1.5; % maximum
 T.Seq(1) = 2.0;
 T.Seq(2:4) = 0.5;
-T.Seq(5) = 1.5;
+T.Seq(5) = 1.5; % also maximum
 T.Probe = 0.05;
 T.ISI = 0.1;
 T.PreRespDelay = 0.05; % very short pause before response screen

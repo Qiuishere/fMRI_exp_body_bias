@@ -31,7 +31,7 @@ RunStart = datestr(now, 'dd-mm-yyyy_HH-MM-SS');
 diary(fullfile(LogDir, sprintf('Subj%02d_%s_%d_%s.txt', SubjNo, RunType, ThisRunNo, RunStart)));
 
 DataFile = fullfile(RunDir, sprintf('Subj%02d_%s_%g.mat', SubjNo, RunType, ThisRunNo));
-AllTrialsFile = fullfile(RunDir, sprintf('Subj%02d_%s_AllTrials.mat', SubjNo, RunType)); 
+AllTrialsFile = fullfile(RunDir, sprintf('Subj%02d_%s_AllTrials.mat', SubjNo, RunType));
 
 BUpDir = fullfile(RunDir,'Backup');
 if ~exist(BUpDir,'dir')
@@ -162,14 +162,14 @@ WaitSecs(T.Delay - (3 * T.Count));
 %% COUNTDOWN
 
 for n = 1:3
-    
+
     CountDownTxt = sprintf('Starting in %g', 4 - n);
     DrawFormattedText(w, CountDownTxt, 'center', 'center', White);
     Screen('FillOval', w, White, FixRct);
     Screen('FrameOval', w, Black, FixRct);
     Screen('Flip',w);
     WaitSecs(T.Count);
-    
+
 end
 
 % Check loading time to subtract from ITI
@@ -399,12 +399,12 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
         end % end of kbcheck
 
     end
-    
+
     %% Feedback (if trial-by-trial)
     % IF YOU USE THIS SUBTRACT FROM TIMING!
 
 %     if strcmp(GiveFB, 'Trial')
-% 
+%
 %         if AllTrials.Hit(trial) == 1
 %             FBColor = [0 255 0];
 %         elseif AllTrials.Hit(trial) == 0
@@ -412,22 +412,23 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
 %         else % if response not given
 %             FBColor = Black;
 %         end
-% 
+%
 %         for frame = 1:Frames.TrialFB
-% 
+%
 %             Screen('FillOval', w, FBColor, FixRct);
 %             Screen('Flip', w);
-% 
+%
 %         end
-% 
+%
 %     else
-% 
+%
 %     end
 
     %% Save files & close textures
 
     tic;
     save(DataFile, 'AllTrials', 'TStamp');
+    save(AllTrialsFile, 'AllTrials');
     save(BUpFile); % save everything
     Screen('Close', [Txtrs ProbeTxtrs]);
 
@@ -459,9 +460,9 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
         AllTrials.Diff(trial + 1), OrientLims(2)), OrientLims(1));
 
     end
-    
+
     %% SHOW SUBJECT'S RESPONSE
-    
+
     if ~isnan(AllTrials.Hit(trial))
         fprintf('Difference: %.1f, Hit: %g, RT: %.3f\n', ...
             ThisInt, AllTrials.Hit(trial), AllTrials.RT(trial));
@@ -476,23 +477,24 @@ end
 %% SAVE FILES
 
 save(DataFile, 'AllTrials', 'TStamp');
+save(AllTrialsFile, 'AllTrials');
 save(BUpFile); % save everything
 
 %% END OF RUN FEEDBACK
 
 if strcmp(GiveFB, 'Run')
-    
+
     MeanOrient = mean(abs(AllTrials.Diff(trial-RunTrials+1:trial)));
-    
+
     EndTxt = sprintf(['End of run %01d/%01d.\n\nYou were able to', ...
             ' see\na difference of:\n%.2f degrees.\n\nGood job!'], ...
             RunNo, NRuns, MeanOrient);
-    
+
 else
-    
+
     EndTxt = sprintf(['Well done! You completed run %g/%g.\n\n', ...
         'You can take a break while we prepare the next run.'], RunNo, NRuns);
-    
+
 end
 
 DrawFormattedText(w, EndTxt, 'center', 'center', White);
@@ -508,13 +510,13 @@ figure;
 subplot(2, 2, 1:2);
 plot(abs(AllTrials.Diff), 'b', 'LineWidth', 2);
 hold on
-plot([1 TotNTrials], [mean(abs(AllTrials.Diff)) mean(abs(AllTrials.Diff))], 'r--', ...
+plot([1 TotNTrials], [nanmean(abs(AllTrials.Diff)) nanmean(abs(AllTrials.Diff))], 'r--', ...
     'LineWidth', 2);
 set(gca, 'ylim', [0 max(abs(AllTrials.Diff)) + 2]);
 set(gca, 'xlim', [1 TotNTrials]);
 
 subplot(2, 2, 3);
-bar(1, mean(AllTrials.Hit(AllTrials.Consistent==1)), 'r');
+bar(1, nanmean(AllTrials.Hit(AllTrials.Consistent==1)), 'r');
 hold on
 errorbar(1, nanmean(AllTrials.Hit(AllTrials.Consistent==1)), ...
     nanstd(AllTrials.Hit(AllTrials.Consistent==1)/sqrt(trial)), 'k', 'LineWidth', 1);
@@ -579,7 +581,3 @@ waitforspace; waitfornokey;
 Priority(0);
 sca
 ShowCursor;
-
-
-
-

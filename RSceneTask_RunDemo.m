@@ -142,7 +142,13 @@ WaitSecs(T.Delay);
 % Check loading time to subtract from ITI
 tic;
 
-%% COUNTDOWN?
+%% LOAD ARROWS FOR ILLUSTRATION
+
+[Im_CW, ~, Alpha_CW] = imread('Arrow_CW_black.png');
+[Im_CCW, ~, Alpha_CCW] = imread('Arrow_CCW_black.png');
+
+ArrowTxt(1) = Screen('MakeTexture', w, cat(3, Im_CW, Alpha_CW));
+ArrowTxt(2) = Screen('MakeTexture', w, cat(3, Im_CCW, Alpha_CCW));
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TRIAL LOOP
@@ -311,8 +317,8 @@ for trial = 1:RunTrials
 
     for frame = 1:Frames.Resp
 
-        Screen('FillOval', w, White, FixRct);
-        Screen('FrameOval', w, Black, FixRct);
+        DrawFormattedText(w, 'CW or CCW?', 'center', 'center', White);
+        sgtext(w, 'Clockwise', 
         tnow = Screen('Flip', w);
 
         if frame == 1
