@@ -181,9 +181,11 @@ tic;
 
 FirstTrial = (ThisRunNo - 1) * RunTrials + 1;
 
+thisrunind = 1;
+
 for trial = FirstTrial:FirstTrial + RunTrials - 1
 
-    fprintf('--- TRIAL %g/%g ---\n', trial, RunTrials);
+    fprintf('--- TRIAL %g/%g ---\n', thisrunind, RunTrials);
 
     %% Prepare for stimulus presentation
 
@@ -194,7 +196,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
     % Start ITI
     Screen('FillOval', w, White, FixRct);
     Screen('FrameOval', w, Black, FixRct);
-    TStamp.event(trial, 1) = Screen('Flip', w);
+    TStamp.event(thisrunind, 1) = Screen('Flip', w);
 
     %% Load images, create textures
 
@@ -289,7 +291,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             tnow = Screen('Flip', w);
 
             if frame == 1
-                TStamp.event(trial, stim + 1) = tnow;
+                TStamp.event(thisrunind, stim + 1) = tnow;
             end
 
         end
@@ -309,9 +311,9 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
 
             if frame == 1
                 if pr == 1
-                    TStamp.event(trial, 7) = tnow;
+                    TStamp.event(thisrunind, 7) = tnow;
                 elseif pr == 2
-                    TStamp.event(trial, 9) = tnow;
+                    TStamp.event(thisrunind, 9) = tnow;
                 end
             end
 
@@ -326,7 +328,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
                 tnow = Screen('Flip', w);
 
                 if frame == 1
-                    TStamp.event(trial, 8) = tnow;
+                    TStamp.event(thisrunind, 8) = tnow;
                 end
 
             end
@@ -335,11 +337,12 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
 
     end
 
-    TStamp.event(trial, 10) = Screen('Flip', w);
+    TStamp.event(thisrunind, 10) = Screen('Flip', w);
     WaitSecs(T.PreRespDelay);
 
     %% Get response
 
+    if RealRun, BitsiBB.clearResponses(); end
     ButPres = 0;
 
     for frame = 1:Frames.Resp
@@ -351,7 +354,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
         tnow = Screen('Flip', w);
 
         if frame == 1
-            TStamp.event(trial, 11) = tnow;
+            TStamp.event(thisrunind, 11) = tnow;
         end
 
         % Response from button box:
@@ -364,8 +367,8 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
                 ButPres = 1;
                 Response = 2 - find(wkey==RespKeys); % 1 for CW, 0 for CCW
                 AllTrials.Hit(trial) = Response == (TheseOrients(1)<TheseOrients(2));
-                AllTrials.RT(trial) = timeStamp - TStamp.event(trial, 11);
-                TStamp.response(trial) = timeStamp;
+                AllTrials.RT(trial) = timeStamp - TStamp.event(thisrunind, 11);
+                TStamp.response(thisrunind) = timeStamp;
             end
 
         end
@@ -395,7 +398,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
             ButPres = 1;
             Response = 2 - find(keyCode(RespKeys));
             AllTrials.Hit(trial) = Response == (TheseOrients(1)<TheseOrients(2));
-            AllTrials.RT(trial) = resptime - TStamp.event(trial, 11);
+            AllTrials.RT(trial) = resptime - TStamp.event(thisrunind, 11);
         end % end of kbcheck
 
     end
@@ -470,6 +473,7 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
         fprintf('Response not given.\n');
     end
 
+    thisrunind = thisrunind + 1;
 
     %% END TRIAL LOOP
 end
