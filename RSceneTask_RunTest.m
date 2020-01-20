@@ -7,7 +7,7 @@ function RSceneTask_RunTest(SubjNo, RunInfo, DataDir)
 
 %% Startup
 
-global Environment
+global Environment % it's used in "RST_Settings_General"!
 global RealRun
 
 RunType = 'Test';
@@ -355,6 +355,8 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
 
         if frame == 1
             TStamp.event(thisrunind, 11) = tnow;
+        elseif ButPres
+            TStamp.event(thisrunind, 12) = tnow;
         end
 
         % Response from button box:
