@@ -478,6 +478,8 @@ for trial = FirstTrial:FirstTrial + RunTrials - 1
     %% END TRIAL LOOP
 end
 
+TStamp.end = GetSecs;
+
 %% SAVE FILES
 
 save(DataFile, 'AllTrials', 'TStamp');

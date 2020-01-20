@@ -247,7 +247,7 @@ for trial = 1:RunTrials
             Screen('FillOval', w, White, FixRct);
             Screen('FrameOval', w, Black, FixRct);
             Screen('Flip', w);
-            
+
         end
 
     end
@@ -283,16 +283,17 @@ for trial = 1:RunTrials
 
     %% Get response
 
+    if RealRun, BitsiBB.clearResponses(); end
     ButPres = 0;
 
     t0 = GetSecs;
-    
+
     while ~ButPres
 
         DrawFormattedText(w, 'Clockwise or Counterclockwise?', 'center', 'center', White);
         %sgtext(w, 'Clockwise or Counterclockwise?', windowRect, 48, 'Helvetica', White, [0, -100]);
         %Screen('DrawTexture', w, CWorCCW_txtr, [], ImRect);
-        
+
         Screen('Flip', w);
 
         % Response from button box:
@@ -349,12 +350,12 @@ for trial = 1:RunTrials
     else % if response not given
         FBColor = Black;
     end
-    
+
     for frame = 1:Frames.TrialFB
-        
+
         Screen('FillOval', w, FBColor, FixRct);
         Screen('Flip', w);
-        
+
     end
 
     %% Save files & close textures
@@ -394,14 +395,14 @@ for trial = 1:RunTrials
     end
 
     %% SHOW SUBJECT'S RESPONSE
-    
+
     if ~isnan(AllTrials.Hit(trial))
         fprintf('Difference: %.1f, Hit: %g, RT: %.3f\n', ...
             ThisInt, AllTrials.Hit(trial), AllTrials.RT(trial));
     else
         fprintf('Response not given.\n');
     end
-    
+
     %% END TRIAL LOOP
 end
 
