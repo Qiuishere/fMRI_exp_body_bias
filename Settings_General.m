@@ -92,25 +92,43 @@ Screen('TextSize', w, 22);
 
 % Screen settings
 
-RefRate = 60;
+switch Environment
+    
+    case 1 % Office
+    
+        RefRate = 60;
+        
+    case 2 % Dummy scanner/projector
+        
+        RefRate = 60;
+        MyScreenRes = [1024 768];
+        ScreenSize = [369 277]; % in mm
+        ViewD = 955; % viewing distance in mm
+        
+    case 3 % Skyra
+        
+        % All details found in 'Optical_path_Skyra_BOLDscreen.pdf'
+        
+        RefRate = 120;
+        
+        MyScreenRes = [1920 1080];
+        ScreenSize = [698.4 392.9]; % in mm
+        ViewD = 1206; % viewing distance in mm (1086 from screen + 100 from mirror + 20 screen glass)
+        
+end
 
 if RealRun
-
-    MyScreenRes = [1024 768];
-    ScreenSize = [369 277]; % in mm
-    ViewD = 955; % viewing distance in mm
     if (1 / ifi - RefRate) >= 1
         error('Framerate is not %g!', RefRate);
     end
     if ~isequal([ScreenResolution.width, ScreenResolution.height], MyScreenRes)
-       error('Resolution is not %g x %g!', MyScreenRes(1), MyScreenRes(2))
+        error('Resolution is not %g x %g!', MyScreenRes(1), MyScreenRes(2))
     end
-
 end
 
 %% Make directories for participant (if needed)
 
-RunDir = fullfile(DataDir,sprintf('Subj%02d', SubjNo), RunType);
+RunDir = fullfile(DataDir, sprintf('Subj%02d', SubjNo), RunType);
 
 if ~exist(RunDir, 'dir')
      mkdir(RunDir);

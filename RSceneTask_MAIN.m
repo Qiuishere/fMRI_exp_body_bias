@@ -29,7 +29,7 @@ addpath(genpath('Functions'));
 StartUp;
 
 global Environment
-Environment = 1; % 1 - office, 2 - dummy/skyra, 3 - prismafit (new screen)
+Environment = 1; % 1 - office, 2 - dummy/beamer, 3 - skyra/prismafit (new screen)
 
 global RealRun
 RealRun = Environment == 2 || Environment == 3;
