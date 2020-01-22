@@ -1,9 +1,9 @@
 %
 %
 % adapted from 'Orient_Task_BlockFB_Demo' - added saving data
-% 
-% 
-% 
+%
+%
+%
 % Adaptive staircase. The scenes have 2 different initial
 % viewpoints (AllTrials.InitView = 1/2) and different final viewpoints (AllTrials.FinalView = 30/90)
 % but in practice all that matters is whether they are consistent or not
@@ -44,7 +44,7 @@ switch Environment
         HideCursor;
         ScreenSize = [530 298];
         ViewD = 570;
-        StimDir_main = fullfile('..', 'Stimuli');
+        StimDir_main = fullfile('.', 'Stimuli');
         StimDir_rot = fullfile(StimDir_main, 'Rotate');
 end
 

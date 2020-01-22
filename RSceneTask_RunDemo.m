@@ -183,6 +183,7 @@ for trial = 1:RunTrials
     BBoxes = dlmread(fullfile(StimDir_main,[ImgFile '_BBox.txt']));
     %BBoxes = BBoxes(Sequence/5+1,:);
     LargestBox = [min(BBoxes(:,1:2)), max(BBoxes(:,3:4))];
+    LargestBox = LargestBox * ImScaling; % scale like image
     LargestBox(3:4) = LargestBox(1:2) + LargestBox(3:4); % convert width and height to x-end and y-end
     LargestBox(1) = LargestBox(1) - XMargin;
     LargestBox(2) = LargestBox(2) - YMargin;
