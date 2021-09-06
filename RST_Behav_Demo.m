@@ -25,6 +25,12 @@ AssertOpenGL;
 
 GiveFeedback = 1;
 
+%% Subject ID prompt
+
+prompt = {'Enter subject ID:'};
+SubjName =  inputdlg(prompt);
+SubjID = SubjName{1};
+
 %% Environment
 
 Environment = 'Office';
@@ -50,7 +56,7 @@ end
 
 %% Experimental variables
 
-TotNTrials = 10;
+TotNTrials = 40;
 
 NScenes = 20;
 
@@ -121,6 +127,22 @@ AllTrials.Orients{1}(2) = max(min(AllTrials.Orients{1}(1) + AllTrials.Diff(1), .
 OrientLims(2)), OrientLims(1));
 
 %% Data path
+
+OutFile = sprintf('Demo_%s.mat', SubjID);
+
+DataPath = 'Demo_Data';
+if ~exist(DataPath,'dir')
+    mkdir(DataPath);
+end
+
+FileToSave = fullfile(DataPath, OutFile);
+
+LogDir = fullfile(DataPath, 'Logs');
+if ~exist(LogDir, 'dir')
+    mkdir(LogDir);
+end
+
+LogFile = fullfile(LogDir, strrep(OutFile, SubjID, [SubjID '_Log']));
 
 %% Keyboard
 
@@ -399,6 +421,9 @@ for trial = 1:TotNTrials
 
             if keyCode(escapeKey)
 
+                save(FileToSave,'AllTrials');
+                save(LogFile);
+
                 Priority(0);
 
                 ShowCursor;
@@ -422,6 +447,9 @@ for trial = 1:TotNTrials
             end
         end
     end
+
+    save(FileToSave, 'AllTrials');
+    save(LogFile);
 
     %% Feedback
 
@@ -477,6 +505,9 @@ end
 
 %% END
 
+save(FileToSave, 'AllTrials');
+save(LogFile);
+
 MeanOrient = mean(abs(AllTrials.Diff(6:10)));
 
 Endtxt = sprintf(['You were able to see\na difference of:\n', ...
@@ -491,3 +522,13 @@ KbStrokeWait(-1);
 Priority(0);
 ShowCursor;
 sca;
+
+%% Plot
+
+figure;
+plot(abs(AllTrials.Diff), 'b', 'LineWidth', 2);
+hold on
+plot([1 TotNTrials], [nanmean(abs(AllTrials.Diff)) nanmean(abs(AllTrials.Diff))], 'r--', ...
+     'LineWidth', 2);
+set(gca, 'ylim', [0 max(abs(AllTrials.Diff)) + 2]);
+set(gca, 'xlim', [1 TotNTrials]);

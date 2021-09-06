@@ -6,6 +6,7 @@ function Run_Localizer(SubjNo, RunInfo, DataDir)
 
 %% startup
 
+global Environment
 global RealRun
 
 RunType = 'Localizer';
@@ -89,22 +90,22 @@ imTex = NaN( length(cond_names), filecount);
 
 % loop through categories
 for ncat = 1 : length(cond_names)
-    
+
     % list files
     filelist = listdir(fullfile(StimDir, cond_names{ncat}, '*.jpg'));
-    
+
     if length( filelist) > imcount
         filelist = filelist{1:imcount};
     end
-    
+
     % loop through files and create texture from image
     for nim = 1:filecount
-        
+
         thisim = imread(fullfile(StimDir, cond_names{ncat}, filelist{nim}));
         thisim = imresize( thisim(:,:,1), myimsize);
-        
+
         imTex(ncat, nim) = Screen('MakeTexture', w, thisim);
-        
+
     end % end of image loop
 end % end of category loop
 
@@ -113,13 +114,13 @@ end % end of category loop
 
 behav.imag = NaN( size(behav.trials));
 for nblock = 1 : size(behav.trials,2)
-    
+
     % if NOT a baseline block
     if behav.blocks(nblock)
 
             % randomly pick 'imcount-ntargets' images (out of all cat. images)
             behav.imag( behav.trials(:, nblock)==0, nblock) = shufflemasks(imTex(behav.blocks(nblock), :), imcount-ntargets)';
-        
+
             % and repeat image if target trial (and localizer run)
             behav.imag( logical( behav.trials(:, nblock)), nblock)    =  behav.imag( logical( [diff( behav.trials(:, nblock))==1; 0]), nblock);
     end
@@ -165,9 +166,9 @@ targRect        =   round( targRect);
 %% scanner trigger
 
 if RealRun
-    
+
     warning('Waiting for scanner trigger');
-    
+
     BitsiScanner.clearResponses();
     firstScan = 0;
     while firstScan == 0
@@ -179,7 +180,7 @@ if RealRun
             firstScan = 1;
         end
     end
-    
+
 else
     warning('Sham run: press spacebar to continue.');
     waitforspace; waitfornokey;
@@ -192,13 +193,13 @@ fprintf('\n SCANNER TRIGGER (test run %g): %s \n', ThisRunNo, datestr(now,'dd-mm
 
 %% start message
 for n = 1:ncount
-    
+
     CountDownTxt = sprintf('\n\n\nStarting in %g', 3 - n + 1);
     DrawFormattedText(w, CountDownTxt, 'center', 'center', White);
     Screen('FillOval', w, fixcols, fixrects);
     Screen('Flip', w);
     WaitSecs(t.count);
-    
+
 end
 
 
@@ -228,27 +229,27 @@ end
 % loop through mini-blocks
 
 for nblock = 1 : length(tstamp.blocks)
-    
+
     blockims = behav.imag(:, nblock);
-    
+
     % print current block
     fprintf( '  - mini-block %g/%g', nblock, length(tstamp.blocks));
-        
+
     % loop through images within block
     for nimage = 1: imcount
-        
+
         % draw stimuli
         for nframe = 1 : nframes.on + nframes.off
-            
+
             % draw image if block > 0
             if nframe <= nframes.on && tstamp.blocks(nblock)
                 Screen( 'DrawTexture', w, blockims(nimage), [], sceRect);
             end
-        
+
             % draw fixation
             Screen('FillOval', w, fixcols, fixrects);
             tnow = Screen('Flip', w);
-            
+
             % log timestamp
             if nframe == 1
                 tstamp.event(  nimage, nblock) = tnow;
@@ -258,12 +259,12 @@ for nblock = 1 : length(tstamp.blocks)
             elseif nframe == nframes.on + 1
                 tstamp.offset( nimage, nblock) = tnow;
             end
-            
+
             if RealRun
-                
+
                 % retreive responses from button box
                 [wkey, timeStamp] = BitsiBB.getResponse( timeout, true);
-                
+
                 if ismember( wkey, RespKeys) && ~butpres
                     butpres = 1;
                     behav.resp(nimage, nblock)   =   find(wkey==RespKeys);          % 1 or 2
@@ -273,14 +274,14 @@ for nblock = 1 : length(tstamp.blocks)
                     butpres = 0;
                 end
             end
-            
+
             % retreive responses from keyboard (to abort run)
             if IsOSX
                 [keydown, ~, keyCode] = KbCheck(-1);
             else
                 [keydown, ~, keyCode] = KbCheck;
             end
-            
+
             if keydown  && keyCode(EscKey)
                 fprintf('\n\nExperiment terminated at %s, diary closed...\n', datestr(now));
                 if RealRun
@@ -295,32 +296,32 @@ for nblock = 1 : length(tstamp.blocks)
                 sca; return
             elseif keydown && ~RealRun && any(keyCode(RespKeys)) && ~butpres
                 butpres = 1;
-                behav.resp(nimage, nblock)   =   find(find(keyCode)==RespKeys); 
+                behav.resp(nimage, nblock)   =   find(find(keyCode)==RespKeys);
             end % end of kbcheck
-            
+
         end % end of current frame
     end % end of current image/trial
-    
+
     % monitor participant performance
     fprintf(' -> Targets reported: %g/%g',  sum( ~isnan( behav.resp(:, nblock))), nansum( logical( behav.trials(:, nblock))));
-    
+
     % monitor PTB performance
     evdur    =  diff( tstamp.event(:, nblock), 1);
     trialdur =  round( 1000 * nanmean( evdur(:)));
     trialstd =  round( 1000 * nanstd( evdur(:)));
     fprintf('(trial dur. %g/%g ms, SD = %g)\n', trialdur, trialset, trialstd);
-    
+
     if ~tstamp.blocks(nblock)
         fprintf('\n');
     end
-    
+
 end % end of presentation loop (i.e., current block)
 
 %% save stuff
 tstamp.diff = tstamp.event - tstamp.trigger;
 
 tstamp.names = cond_names;
-    
+
 save(DataFile, 'tstamp', 'behav');
 save(BUpFile); % save everything
 
@@ -328,25 +329,25 @@ save(BUpFile); % save everything
 %% evaluate performance
 
 if RealRun
-    
+
     x1 = behav.check( ~isnan( behav.check));
     x1 = x1(:);
     perf = sum( x1 > 0.35 & x1 < 1.5); % random RT thresholds
     ntargs = length( behav.blocks(logical(behav.blocks))) .* ntargets;
-    
+
     percorr = 100 * perf/ntargs;
-    
+
     %% exit message
-    
+
     % select message, depending on current run (w.r.t. planned runs)
     m1 = sprintf('Well done, you finished the run!\nTargets detected: %2.1f%%.', percorr);
     m2 = 'You can take a little break,\nwhile the next run is loading.';
-    
-    
+
+
     % display message
     DrawFormattedText(w, [m1, '\n', m2], 'center', 'center', White);
     Screen('Flip', w);
-    
+
 end
 
 %% clean up
@@ -390,4 +391,3 @@ warning('Press space to continue...')
 waitforspace; waitfornokey;
 
 sca; ShowCursor;
-
