@@ -1,4 +1,4 @@
-function [NextRunNo, NOccur] = EstiRun(SubjNo,Runs,DataDir)
+function [NextRunNo, NOccur] = EstiRun(SubNo,Runs,DataDir)
 
 % Estimate next run (number) based on previously saved files. 
 
@@ -12,13 +12,13 @@ for run = 1:length(Runs)
     
     if ~strcmp(Runs{run}, 'Resting state')
         
-        RunFiles{run} = fullfile(DataDir,sprintf('Subj%02d', SubjNo), Runs{run}, ...
-            sprintf('Subj%02d_%s_%g.mat', SubjNo, Runs{run}, NOccur(run)));
+        RunFiles{run} = fullfile(DataDir,sprintf('Sub%02d', SubNo), Runs{run}, ...
+            sprintf('Sub%02d_%s_%g.mat', SubNo, Runs{run}, NOccur(run)));
         
     else
         
-        RunFiles{run} = fullfile(DataDir,sprintf('Subj%02d', SubjNo), Runs{run}, ...
-            sprintf('Subj%02d_%s.mat', SubjNo, Runs{run}));
+        RunFiles{run} = fullfile(DataDir,sprintf('Sub%02d', SubNo), Runs{run}, ...
+            sprintf('Sub%02d_%s.mat', SubNo, Runs{run}));
     
     end
     

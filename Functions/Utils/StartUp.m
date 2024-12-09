@@ -16,7 +16,7 @@ AssertOpenGL;
 % Suppress non-critical tests and warnings      (TEST ELSEWHERE!)
 Screen('Preference', 'VisualDebuglevel',    3);
 Screen('Preference', 'SuppressAllWarnings', 1);
-Screen('Preference',  'SkipSyncTests',       2);
+Screen('Preference',  'SkipSyncTests',      2);
 
 % PTB preparation
 KbName('UnifyKeyNames');
